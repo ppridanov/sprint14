@@ -11,7 +11,7 @@ module.exports.createUser = (req, res) => {
       about: req.body.about,
       avatar: req.body.avatar,
     }))
-    .then(user => res.status(201).send(user))
+    .then(() => res.status(201).send({message: 'Пользователь создан'}))
     .catch((err) => res.status(400).send(err.message));
 }
 
@@ -20,11 +20,13 @@ module.exports.login = (req, res) => {
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ '_id': user._id }, 'super-strong-secret', { expiresIn: '1h' })
+      const { JWT_SECRET } = process.env;
+      const token = jwt.sign({ '_id': user._id }, JWT_SECRET, { expiresIn: '1d' })
       res
         .cookie('jwt', token, {
           maxAge: 3600000,
           httpOnly: true,
+          sameSite: true,
         })
         .send(token)
         .end()
@@ -50,15 +52,29 @@ module.exports.getUser = (req, res) => {
 module.exports.updateUserInfo = (req, res) => {
   const userId = req.user._id;
   const { name, about } = req.body;
-  User.findByIdAndUpdate(userId, { name, about }, { new: true, runValidators: true })
-    .then((user) => res.send({ data: user }))
-    .catch((err) => res.status(500).send(err.message));
+  User.findById(userId)
+  .then((user) => {
+    if (user.id != userId) {
+      return Promise.reject(new Error('У вас нет доступа к изменению чужих аккаунтов'))
+    }
+    User.findByIdAndUpdate(userId, { name, about }, { new: true, runValidators: true })
+      .then((user) => res.send({ data: user }))
+      .catch((err) => res.status(500).send(err.message));
+  })
+  .catch((err) => res.status(500).send({ message: 'Произошла ошибка' }));
 };
 
 module.exports.updateUserAvatar = (req, res) => {
   const userId = req.user._id;
   const { avatar } = req.body;
-  User.findByIdAndUpdate(userId, { avatar }, { new: true, runValidators: true })
-    .then((user) => res.send({ data: user }))
-    .catch((err) => res.status(500).send(err.message));
+  User.findById(userId)
+  .then((user) => {
+    if (user.id != userId) {
+      return Promise.reject(new Error('У вас нет доступа к изменению чужих аккаунтов'))
+    }
+    User.findByIdAndUpdate(userId, { avatar }, { new: true, runValidators: true })
+      .then((user) => res.send({ data: user }))
+      .catch((err) => res.status(500).send(err.message));
+  })
+  .catch((err) => res.status(500).send({ message: 'Произошла ошибка' }))
 };

@@ -23,9 +23,7 @@ module.exports.deleteCard = (req, res) => {
         .then((card) => res.send({ data: card }))
         .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
     })
-  // Card.findByIdAndRemove(cardId)
-  //   .then((card) => res.send({ data: card }))
-  //   .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch(() => res.status(404).send({ message: 'Не найден объект с таким идентификатором' }));
 };
 
 module.exports.getAllCards = (req, res) => {
