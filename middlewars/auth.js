@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 
 module.exports = (req, res, next) => {
   const { authorization } = req.headers;
-  const { JWT_SECRET } = process.env;
+  const JWT_SECRET = f86fa1ca3730b0a770c44debf1cea55ae915f2bd9809cb5ae1239a1f6fc80314;
   if (!authorization || !authorization.startsWith('Bearer ')) {
     return res
       .status(401)

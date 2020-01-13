@@ -20,7 +20,7 @@ module.exports.login = (req, res) => {
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const { JWT_SECRET } = process.env;
+      const JWT_SECRET = f86fa1ca3730b0a770c44debf1cea55ae915f2bd9809cb5ae1239a1f6fc80314;
       const token = jwt.sign({ '_id': user._id }, JWT_SECRET, { expiresIn: '7d' })
       res
         .cookie('jwt', token, {
