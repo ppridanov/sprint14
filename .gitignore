@@ -7,4 +7,4 @@ npm-debug.log*
 .idea
 /dist
 /.vscode
-
+.env
