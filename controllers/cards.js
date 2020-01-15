@@ -1,11 +1,8 @@
 const Card = require('../models/card');
-const cookieParser = require('cookie-parser');
 
 module.exports.createCard = (req, res) => {
-  console.log(req.user._id);
   const { name, link } = req.body;
   const ownerId = req.user._id;
-  console.log(req.body);
   Card.create({ name, link, owner: ownerId })
     .then((card) => res.send({ data: card }))
     .catch((err) => res.status(500).send(err.message));
@@ -16,8 +13,8 @@ module.exports.deleteCard = (req, res) => {
   const ownerId = req.user._id;
   Card.findById(cardId)
     .then((card) => {
-      if (card.owner != ownerId) {
-        return res.status(401).send({ message: 'Вы не имеете доступ к удалению чужих карточек' })
+      if (card.owner !== ownerId) {
+        return res.status(401).send({ message: 'Вы не имеете доступ к удалению чужих карточек' });
       }
       Card.findByIdAndRemove(cardId)
         .then((card) => res.send({ data: card }))
@@ -34,11 +31,10 @@ module.exports.getAllCards = (req, res) => {
 
 module.exports.getCard = (req, res) => {
   const { cardId } = req.params;
-  console.log(cardId)
   Card.findById(cardId)
     .then((card) => res.send(card.owner))
     .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
-}
+};
 module.exports.likeCard = (req, res) => {
   const { cardId } = req.params;
   Card.findByIdAndUpdate(cardId, { $addToSet: { likes: req.user._id } }, { new: true })

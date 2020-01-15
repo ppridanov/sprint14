@@ -1,7 +1,5 @@
 const router = require('express').Router();
 const auth = require('../middlewars/auth');
-const Card = require('../models/card');
-const cookieParser = require('cookie-parser');
 
 const {
   createCard,
@@ -14,7 +12,7 @@ const {
 
 router.post('/cards', auth, createCard);
 router.delete('/cards/:cardId', auth, deleteCard);
-router.get('/cards/:cardId', auth, getCard)
+router.get('/cards/:cardId', auth, getCard);
 router.get('/cards/', auth, getAllCards);
 router.put('/cards/:cardId/likes', auth, likeCard);
 router.delete('/cards/:cardId/likes', auth, dislikeCard);

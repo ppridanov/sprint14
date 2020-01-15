@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 
 module.exports = (req, res, next) => {
   const { authorization } = req.headers;
-  const JWT_SECRET = f86fa1ca3730b0a770c44debf1cea55ae915f2bd9809cb5ae1239a1f6fc80314;
+  const JWT_SECRET = 'f86fa1ca3730b0a770c44debf1cea55ae915f2bd9809cb5ae1239a1f6fc80314';
   if (!authorization || !authorization.startsWith('Bearer ')) {
     return res
       .status(401)
@@ -14,12 +14,12 @@ module.exports = (req, res, next) => {
 
   try {
     payload = jwt.verify(token, JWT_SECRET);
-  } catch(err) {
+  } catch (err) {
     return res
       .status(401)
-      .send({ message: 'Доступ запрещен. Необходима авторизация' })
+      .send({ message: 'Доступ запрещен. Необходима авторизация' });
   }
 
   req.user = payload;
   next();
-}
+};

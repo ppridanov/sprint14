@@ -1,7 +1,8 @@
 {
   "extends": "airbnb-base",
   "rules": {
-    "allow": "_id",
-    "linebreak-style": 0
+    "no-underscore-dangle": [2, {"allow": ["_id"]}],
+    "consistent-return": [0],
+    "no-shadow": [0]
   }
 }
