@@ -14,12 +14,12 @@ module.exports = (req, res, next) => {
 
   try {
     payload = jwt.verify(token, JWT_SECRET);
+    req.user = payload;
   } catch (err) {
     return res
       .status(401)
       .send({ message: 'Доступ запрещен. Необходима авторизация' });
   }
 
-  req.user = payload;
   next();
 };

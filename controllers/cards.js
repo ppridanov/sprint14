@@ -13,12 +13,13 @@ module.exports.deleteCard = (req, res) => {
   const ownerId = req.user._id;
   Card.findById(cardId)
     .then((card) => {
-      if (card.owner !== ownerId) {
+      if (card.owner.toString() === ownerId) {
+        Card.findByIdAndRemove(cardId)
+          .then((card) => res.send({ data: card }))
+          .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+      } else {
         return res.status(401).send({ message: 'Вы не имеете доступ к удалению чужих карточек' });
       }
-      Card.findByIdAndRemove(cardId)
-        .then((card) => res.send({ data: card }))
-        .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
     })
     .catch(() => res.status(404).send({ message: 'Не найден объект с таким идентификатором' }));
 };
