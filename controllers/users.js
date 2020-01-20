@@ -3,6 +3,10 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
 module.exports.createUser = (req, res) => {
+  console.log(req.body.password.length);
+  if (req.body.password.length < 8) {
+    return res.status(400).send({ message: 'Пароль должен содержать не менее 8 символов' });
+  }
   bcrypt.hash(req.body.password, 10)
     .then((hash) => User.create({
       name: req.body.name,
@@ -53,12 +57,13 @@ module.exports.updateUserInfo = (req, res) => {
   const { name, about } = req.body;
   User.findById(userId)
     .then((user) => {
-      if (user.id !== userId) {
+      if (user.id.toString() === userId) {
+        User.findByIdAndUpdate(userId, { name, about }, { new: true, runValidators: true })
+          .then((user) => res.send({ data: user }))
+          .catch((err) => res.status(500).send(err.message));
+      } else {
         return Promise.reject(new Error('У вас нет доступа к изменению чужих аккаунтов'));
       }
-      User.findByIdAndUpdate(userId, { name, about }, { new: true, runValidators: true })
-        .then((user) => res.send({ data: user }))
-        .catch((err) => res.status(500).send(err.message));
     })
     .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
 };
@@ -68,12 +73,13 @@ module.exports.updateUserAvatar = (req, res) => {
   const { avatar } = req.body;
   User.findById(userId)
     .then((user) => {
-      if (user.id !== userId) {
+      if (user.id.toSting() === userId) {
+        User.findByIdAndUpdate(userId, { avatar }, { new: true, runValidators: true })
+          .then((user) => res.send({ data: user }))
+          .catch((err) => res.status(500).send(err.message));
+      } else {
         return Promise.reject(new Error('У вас нет доступа к изменению чужих аккаунтов'));
       }
-      User.findByIdAndUpdate(userId, { avatar }, { new: true, runValidators: true })
-        .then((user) => res.send({ data: user }))
-        .catch((err) => res.status(500).send(err.message));
     })
     .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
 };
