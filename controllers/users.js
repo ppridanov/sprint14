@@ -3,7 +3,6 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
 module.exports.createUser = (req, res) => {
-  console.log(req.body.password.length);
   if (req.body.password.length < 8) {
     return res.status(400).send({ message: 'Пароль должен содержать не менее 8 символов' });
   }
