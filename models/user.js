@@ -15,7 +15,7 @@ const userSchema = new mongoose.Schema({
     unique: true,
     validate: {
       validator: (v) => isEmail(v),
-      message: 'Неправильный формат почты.',
+      message: 'Неверный формат почты.',
     },
   },
   password: {
@@ -58,4 +58,11 @@ userSchema.statics.findUserByCredentials = function check(email, password) {
         });
     });
 };
+userSchema.post('save', (error, docs, next) => {
+  if (error.name === 'MongoError' && error.code === 11000) {
+    next(new Error('Такой почтовый ящик уже существует'));
+  } else {
+    next(error);
+  }
+});
 module.exports = mongoose.model('user', userSchema);
