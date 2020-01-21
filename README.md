@@ -11,5 +11,6 @@ My project have 2 scripts.
 
 2. **"Dev"** - Developer script to create a local server and quickly view changes in the code. Use npm run dev for that.
 
-version **0.0.1**
+
+version **0.0.3**
 
