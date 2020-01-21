@@ -1,24 +1,25 @@
 const jwt = require('jsonwebtoken');
 
+function errorStatus(res) {
+  return res
+    .status(401)
+    .send({ message: 'Доступ запрещен. Необходима авторизация' });
+}
+
 module.exports = (req, res, next) => {
-  const authorization = `Bearer ${req.cookies.jwt}`;
+  const cookie = req.cookies.jwt;
   const JWT_SECRET = 'f86fa1ca3730b0a770c44debf1cea55ae915f2bd9809cb5ae1239a1f6fc80314';
-  if (!authorization || !authorization.startsWith('Bearer ')) {
-    return res
-      .status(401)
-      .send({ message: 'Доступ запрещен. Необходима авторизация' });
+  if (!cookie) {
+    errorStatus(res);
   }
 
-  const token = authorization.replace('Bearer ', '');
   let payload;
 
   try {
-    payload = jwt.verify(token, JWT_SECRET);
+    payload = jwt.verify(cookie, JWT_SECRET);
     req.user = payload;
   } catch (err) {
-    return res
-      .status(401)
-      .send({ message: 'Доступ запрещен. Необходима авторизация' });
+    errorStatus(res);
   }
 
   next();

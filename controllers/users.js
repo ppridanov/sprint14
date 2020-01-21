@@ -1,7 +1,18 @@
+// Переменные
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
+// Функции
+function errorUserSide(res, err) {
+  res.status(401).send(err.message);
+}
+
+function errorServerSide(res) {
+  res.status(500).send({ message: 'Произошла ошибка, обратитесь к администратору' });
+}
+
+// Создание пользователя
 module.exports.createUser = (req, res) => {
   if (req.body.password.length < 8) {
     return res.status(400).send({ message: 'Пароль должен содержать не менее 8 символов' });
@@ -15,9 +26,10 @@ module.exports.createUser = (req, res) => {
       avatar: req.body.avatar,
     }))
     .then(() => res.status(201).send({ message: 'Пользователь создан' }))
-    .catch((err) => res.status(400).send(err.message));
+    .catch((err) => errorUserSide(res, err));
 };
 
+// Вход пользователя
 module.exports.login = (req, res) => {
   const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
@@ -33,24 +45,25 @@ module.exports.login = (req, res) => {
         .send(token)
         .end();
     })
-    .catch((err) => {
-      res.status(401).send({ message: err.message });
-    });
+    .catch((err) => errorUserSide(res, err));
 };
 
+// Получить всех пользователей
 module.exports.getAllUsers = (req, res) => {
   User.find({})
     .then((users) => res.send({ data: users }))
-    .catch((err) => res.status(500).send(err.message));
+    .catch(() => errorServerSide(res));
 };
 
+// Получить одного пользователя
 module.exports.getUser = (req, res) => {
   const userId = req.user._id;
   User.findById(userId)
     .then((user) => res.send({ data: user }))
-    .catch((err) => res.status(500).send(err.message));
+    .catch(() => errorServerSide(res));
 };
 
+// Получить информацию пользователя
 module.exports.updateUserInfo = (req, res) => {
   const userId = req.user._id;
   const { name, about } = req.body;
@@ -59,14 +72,15 @@ module.exports.updateUserInfo = (req, res) => {
       if (user.id.toString() === userId) {
         User.findByIdAndUpdate(userId, { name, about }, { new: true, runValidators: true })
           .then((user) => res.send({ data: user }))
-          .catch((err) => res.status(500).send(err.message));
+          .catch(() => errorServerSide(res));
       } else {
         return Promise.reject(new Error('У вас нет доступа к изменению чужих аккаунтов'));
       }
     })
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch(() => errorServerSide(res));
 };
 
+// Обновить аватар пользователя
 module.exports.updateUserAvatar = (req, res) => {
   const userId = req.user._id;
   const { avatar } = req.body;
@@ -75,10 +89,10 @@ module.exports.updateUserAvatar = (req, res) => {
       if (user.id.toSting() === userId) {
         User.findByIdAndUpdate(userId, { avatar }, { new: true, runValidators: true })
           .then((user) => res.send({ data: user }))
-          .catch((err) => res.status(500).send(err.message));
+          .catch(() => errorServerSide(res));
       } else {
         return Promise.reject(new Error('У вас нет доступа к изменению чужих аккаунтов'));
       }
     })
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
+    .catch(() => errorServerSide(res));
 };
